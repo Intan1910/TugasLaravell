@@ -3,70 +3,67 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Mahasiswa;
 
 class HomeController extends Controller
 {
-    // Halaman utama dengan data buku
-    public function index(Request $request)
+    // ✅ Halaman awal
+    public function home()
     {
-        $books = [
-    ['judul' => 'Hujan', 'penulis' => 'Tere Liye', 'tahun' => 2016],
-    ['judul' => 'Bumi', 'penulis' => 'Tere Liye', 'tahun' => 2014],
-    ['judul' => 'Matahari', 'penulis' => 'Tere Liye', 'tahun' => 2016],
-    ['judul' => 'Bintang', 'penulis' => 'Tere Liye', 'tahun' => 2017],
-    ['judul' => 'Rembulan Tenggelam di Wajahmu', 'penulis' => 'Tere Liye', 'tahun' => 2009],
-    ['judul' => 'Pulang', 'penulis' => 'Tere Liye', 'tahun' => 2015],
-    ['judul' => 'Pergi', 'penulis' => 'Tere Liye', 'tahun' => 2018],
-    ['judul' => 'Negeri Para Bedebah', 'penulis' => 'Tere Liye', 'tahun' => 2012],
-    ['judul' => 'Negeri di Ujung Tanduk', 'penulis' => 'Tere Liye', 'tahun' => 2013],
-    ['judul' => 'Tentang Kamu', 'penulis' => 'Tere Liye', 'tahun' => 2016],
-];
-
-        // fitur pencarian
-        $search = $request->input('search');
-        if ($search) {
-            $books = array_filter($books, function ($item) use ($search) {
-                return stripos($item['judul'], $search) !== false ||
-                       stripos($item['penulis'], $search) !== false;
-            });
-        }
-
-        return view('home', [
-            'books' => $books,
-            'search' => $search ?? '',
-            'message' => null
-        ]);
+        return view('welcome');
     }
 
-    // Menampilkan form input
+    // ✅ Halaman buku (contoh)
+    public function index()
+    {
+        $buku = [
+            ['judul' => 'Laskar Pelangi', 'penulis' => 'Andrea Hirata'],
+            ['judul' => 'Bumi Manusia', 'penulis' => 'Pramoedya Ananta Toer'],
+        ];
+        return view('home', compact('home'));
+    }
+
+    // ✅ Halaman form pesan
     public function form()
     {
         return view('form');
     }
 
-    // Menerima data form dan kembali ke home
-    public function submit(Request $request)
+    // ✅ CRUD Mahasiswa
+    public function mahasiswa()
     {
-        $dataMessage = $request->message;
+        $data = Mahasiswa::all();
+        return view('mahasiswa', compact('data'));
+    }
 
-        // Tetap menampilkan daftar buku saat kembali
-        $books = [
-           ['judul' => 'Hujan', 'penulis' => 'Tere Liye', 'tahun' => 2016],
-    ['judul' => 'Bumi', 'penulis' => 'Tere Liye', 'tahun' => 2014],
-    ['judul' => 'Matahari', 'penulis' => 'Tere Liye', 'tahun' => 2016],
-    ['judul' => 'Bintang', 'penulis' => 'Tere Liye', 'tahun' => 2017],
-    ['judul' => 'Rembulan Tenggelam di Wajahmu', 'penulis' => 'Tere Liye', 'tahun' => 2009],
-    ['judul' => 'Pulang', 'penulis' => 'Tere Liye', 'tahun' => 2015],
-    ['judul' => 'Pergi', 'penulis' => 'Tere Liye', 'tahun' => 2018],
-    ['judul' => 'Negeri Para Bedebah', 'penulis' => 'Tere Liye', 'tahun' => 2012],
-    ['judul' => 'Negeri di Ujung Tanduk', 'penulis' => 'Tere Liye', 'tahun' => 2013],
-    ['judul' => 'Tentang Kamu', 'penulis' => 'Tere Liye', 'tahun' => 2016],
-        ];
+    public function createMahasiswa()
+    {
+        return view('create');
+    }
 
-        return view('home', [
-            'books' => $books,
-            'search' => '',
-            'message' => $dataMessage
-        ]);
+    public function storeMahasiswa(Request $request)
+    {
+        Mahasiswa::create($request->all());
+        return redirect()->route('mahasiswa')->with('success', 'Data berhasil ditambahkan!');
+    }
+
+    public function editMahasiswa($id)
+    {
+        $data = Mahasiswa::find($id);
+        return view('edit', compact('data'));
+    }
+
+    public function updateMahasiswa(Request $request, $id)
+    {
+        $data = Mahasiswa::find($id);
+        $data->update($request->all());
+        return redirect()->route('mahasiswa')->with('success', 'Data berhasil diupdate!');
+    }
+
+    public function destroyMahasiswa($id)
+    {
+        $data = Mahasiswa::find($id);
+        $data->delete();
+        return redirect()->route('mahasiswa')->with('success', 'Data berhasil dihapus!');
     }
 }
